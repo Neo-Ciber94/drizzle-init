@@ -3,7 +3,7 @@ import { Command } from "commander";
 import packageJson from "../package.json";
 import inquirer from "inquirer";
 import path from "path";
-import createCommand, { type CreateCommandArgs } from "./commands/createCommand";
+import initCommand, { type InitCommandArgs } from "./commands/init";
 import {
   DRIVERS,
   MYSQL_DB_PROVIDERS,
@@ -17,7 +17,7 @@ const command = new Command()
   .version(packageJson.version)
   .action(async () => {
     const hasSrcDirectory = path.join(process.cwd(), "src");
-    const args: CreateCommandArgs = await inquirer.prompt([
+    const args: InitCommandArgs = await inquirer.prompt([
       {
         name: "driver",
         message: "What driver you want to use?",
@@ -77,7 +77,7 @@ const command = new Command()
       },
     ]);
 
-    await createCommand(args);
+    await initCommand(args);
   });
 
 command.parseAsync().catch((error) => {

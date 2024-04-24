@@ -2,7 +2,7 @@ import fse from "fs-extra";
 import path from "path";
 import { type DbProvider } from "../constants";
 
-export type CreateCommandArgs = {
+export type InitCommandArgs = {
   driver: "mysql" | "postgresql" | "sqlite";
   dbProvider: DbProvider;
   configFile: string;
@@ -10,8 +10,9 @@ export type CreateCommandArgs = {
   databaseDir: string;
 };
 
-export default async function createCommand(args: CreateCommandArgs) {
+export default async function createCommand(args: InitCommandArgs) {
   const useTypescript = args.configFile.endsWith(".ts") || (await hasTsConfig());
+  
 }
 
 async function hasTsConfig() {
