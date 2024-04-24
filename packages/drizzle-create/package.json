@@ -1,0 +1,30 @@
+{
+  "name": "drizzle-project",
+  "version": "0.0.1",
+  "description": "Initialize drizzle in a project",
+  "main": "index.js",
+  "author": "Freddy L.",
+  "license": "MIT",
+  "bin": {
+    "create-drizzle-project": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src"
+  },
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "commander": "^12.0.0",
+    "fs-extra": "^11.2.0",
+    "inquirer": "^9.2.19"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/inquirer": "^9.0.7",
+    "eslint": "^9.1.1",
+    "tsup": "^8.0.2",
+    "tsx": "^4.7.2",
+    "typescript": "^5.4.5"
+  }
+}
