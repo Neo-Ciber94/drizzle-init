@@ -1,6 +1,6 @@
 import fse from "fs-extra";
 import path from "path";
-import { type DbProvider } from "../constants";
+import type { Driver, Language, DbProvider } from "../types";
 import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -27,12 +27,15 @@ type PackageJson = {
   dependencies?: Record<string, string>;
   devDependencies?: Record<string, string>;
   scripts?: Record<string, string>;
+  drizzle: {
+    config: "mysql2" | "pg" | "better-sqlite";
+  };
 };
 
 export type InitCommandArgs = {
-  driver: "mysql" | "postgresql" | "sqlite";
+  driver: Driver;
   dbProvider: DbProvider;
-  configFile: string;
+  configType: Language;
   migrateFile: string;
   databaseDir: string;
 };
@@ -40,10 +43,8 @@ export type InitCommandArgs = {
 const templatesPath = path.join(__dirname, "..", "templates");
 
 export default async function createCommand(args: InitCommandArgs) {
-  const useTypescript = args.configFile.endsWith(".ts") || (await hasTsConfig());
-
-  const schemaTemplate = path.join(templatesPath, "schemas", `${args.driver}-schema.ts`);
-  const providerDir = path.join(templatesPath, "schemas", args.driver, args.dbProvider);
+  const schemaFile = path.join(templatesPath, "schemas", `${args.driver}.schema.ts`);
+  const providerDir = path.join(templatesPath, "providers", args.driver, args.dbProvider);
 
   if (!(await fse.exists(providerDir))) {
     throw new Error(
@@ -51,20 +52,31 @@ export default async function createCommand(args: InitCommandArgs) {
     );
   }
 
-  const schemaFile = await fse.readFile(schemaTemplate, "utf-8");
-  const databaseFile = await fse.readFile(path.join(providerDir, "index.ts"), "utf-8");
+  const schema = await fse.readFile(schemaFile, "utf-8");
   const packageJson: PackageJson = await fse.readJson(path.join(providerDir, "package.json"));
+  const configFile = packageJson.drizzle?.config;
 
-  // console.log(schemaFile);
-  await createFileIfDontExists(path.join(process.cwd()));
+  if (!configFile) {
+    throw new Error(`package.json drizzle.config section was not defined for '${providerDir}'`);
+  }
+
+  const drizzleConfig = await fse.readFile(
+    path.join(templatesPath, "config", `${configFile}.config.ts`),
+    "utf-8"
+  );
+
+  console.log({ schema, drizzleConfig });
+
+  // 1. Read template files (schema, migration, config, database)
+
+  // 2. Write template to directory
+
+  // 3. Update package.json database scripts
+
+  // 4. Install dependencies
 }
 
-async function hasTsConfig() {
-  const files = await fse.readdir(process.cwd());
-  return files.some((f) => path.basename(f).startsWith("tsconfig."));
-}
-
-async function createFileIfDontExists(filePath: string) {
+async function createFileIfDontExists(filePath: string, content: string) {
   if (await fse.exists(filePath)) {
     throw new Error(`${filePath} already exists`);
   }
@@ -72,4 +84,5 @@ async function createFileIfDontExists(filePath: string) {
   console.log(`Creating '${filePath}'...`);
   const dirname = path.dirname(filePath);
   await fse.ensureDir(dirname);
+  await fse.writeFile(filePath, content);
 }

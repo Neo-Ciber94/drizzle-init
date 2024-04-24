@@ -3,20 +3,24 @@ import { Command } from "commander";
 import packageJson from "../package.json";
 import inquirer from "inquirer";
 import path from "path";
+import fse from "fs-extra";
 import initCommand, { type InitCommandArgs } from "./commands/init";
 import {
+  type Language,
   DRIVERS,
   MYSQL_DB_PROVIDERS,
   POSTGRESTQL_DB_PROVIDERS,
   SQLITE_PROVIDERS,
-  DRIZZLE_CONFIG_FILENAME,
-} from "./constants";
+} from "./types";
 
 const command = new Command()
   .description(packageJson.description)
   .version(packageJson.version)
   .action(async () => {
-    const hasSrcDirectory = path.join(process.cwd(), "src");
+    const hasSrcDirectory = await fse.exists(path.join(process.cwd(), "src"));
+    const hasAppDirectory = await fse.exists(path.join(process.cwd(), "app"));
+    const projectLang = await guestProjectLanguage();
+
     const args: InitCommandArgs = await inquirer.prompt([
       {
         name: "driver",
@@ -45,26 +49,24 @@ const command = new Command()
         },
       },
       {
-        name: "configFile",
-        message: "Config file location",
-        default: "./drizzle.config.ts",
-        validate(input) {
-          const filename = path.basename(input);
-
-          if (!DRIZZLE_CONFIG_FILENAME.includes(filename)) {
-            const validFileNames = DRIZZLE_CONFIG_FILENAME.map((f) => chalk.blue(f)).join(", ");
-
-            return `Invalid config file name, expected one of: ${validFileNames}`;
-          }
-
-          return true;
-        },
+        name: "configType",
+        message: "Config file type",
+        default: projectLang ?? "typescript",
+        type: "list",
+        choices: [
+          { name: "javascript", value: chalk.yellowBright("Javascript") },
+          { name: "typescript", value: chalk.blueBright("Typescript") },
+        ] satisfies { name: Language; value: string }[],
       },
       {
         name: "migrateFile",
         message: "Migrate file location",
         default: "./migrate.ts",
         async validate(input) {
+          if (path.isAbsolute(input)) {
+            return "Migrate file path should be relative to the current dir";
+          }
+
           // We assume is a valid file if have an extension
           const extension = path.extname(input);
           return extension.length > 0 ? true : "Expected a valid file, eg: migrate.ts";
@@ -73,12 +75,47 @@ const command = new Command()
       {
         name: "databaseDir",
         message: "Database and Schema directory",
-        default: hasSrcDirectory ? "./src/lib/db" : "./lib/db",
+        validate(input) {
+          return path.isAbsolute(input)
+            ? "Database and schema path should be relative to the current dir"
+            : true;
+        },
+        default() {
+          if (hasSrcDirectory) {
+            return "./src/lib/db";
+          }
+
+          if (hasAppDirectory) {
+            return "./app/lib/db";
+          }
+
+          return "./lib/db";
+        },
       },
     ]);
 
     await initCommand(args);
   });
+
+async function guestProjectLanguage(): Promise<Language | null> {
+  const files = await fse.readdir(process.cwd());
+  const isTypescriptProject = files.some((fileName) =>
+    path.basename(fileName).startsWith("tsconfig.")
+  );
+
+  if (isTypescriptProject) {
+    return "typescript";
+  }
+
+  const isJavascriptProject = files.some((fileName) =>
+    path.basename(fileName).startsWith("jsconfig.")
+  );
+  if (isJavascriptProject) {
+    return "javascript";
+  }
+
+  return null;
+}
 
 command.parseAsync().catch((error) => {
   console.error(chalk.red("Failed to initialize drizzle"), error);
