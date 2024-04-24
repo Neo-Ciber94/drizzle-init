@@ -1,7 +1,6 @@
 export const DRIZZLE_CONFIG_FILENAME = [
   "drizzle.config.js",
   "drizzle.config.ts",
-  "drizzle.config.json",
 ];
 
 export const DRIVERS = ["mysql", "postgresql", "sqlite"] as const;

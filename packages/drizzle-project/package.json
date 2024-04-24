@@ -5,9 +5,7 @@
   "main": "index.js",
   "author": "Freddy L.",
   "license": "MIT",
-  "bin": {
-    "create-drizzle-project": "dist/cli.js"
-  },
+  "bin": "dist/cli.js",
   "scripts": {
     "build": "tsup && ncp ./src/templates ./dist/templates",
     "typecheck": "tsc --noEmit",
@@ -22,6 +20,7 @@
   "devDependencies": {
     "@types/fs-extra": "^11.0.4",
     "@types/inquirer": "^9.0.7",
+    "drizzle-kit": "^0.20.17",
     "drizzle-orm": "^0.30.9",
     "eslint": "^9.1.1",
     "ncp": "^2.0.0",

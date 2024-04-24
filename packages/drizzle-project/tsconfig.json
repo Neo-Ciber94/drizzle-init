@@ -6,6 +6,9 @@
         "allowSyntheticDefaultImports": true
     },
     "include": [
-        "src"
+        "src",
+    ],
+    "exclude": [
+        "src/templates/**/*"
     ]
 }

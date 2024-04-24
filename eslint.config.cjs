@@ -22,6 +22,7 @@ module.exports = [
       "@typescript-eslint/no-floating-promises": "error",
       "@typescript-eslint/consistent-type-imports": "error",
       "no-unused-vars": "off",
+      "@typescript-eslint/ban-ts-comment": "off",
       "@typescript-eslint/no-unused-vars": [
         "warn",
         {

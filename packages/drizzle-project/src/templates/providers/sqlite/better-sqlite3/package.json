@@ -1,0 +1,16 @@
+{
+  "name": "better-sqlite3-provider",
+  "version": "0.0.01",
+  "description": "Drizzle better-sqlite3 database provider template",
+  "license": "MIT",
+  "drizzle": {
+    "config": "better-sqlite3"
+  },
+  "dependencies": {
+    "better-sqlite3": "^9.5.0",
+    "drizzle-orm": "^0.30.9"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.20.17"
+  }
+}
