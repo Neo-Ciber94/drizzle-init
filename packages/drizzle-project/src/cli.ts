@@ -73,7 +73,7 @@ const command = new Command()
       {
         name: "databaseDir",
         message: "Database and Schema directory",
-        default: hasSrcDirectory ? "./src/db" : "./lib/db",
+        default: hasSrcDirectory ? "./src/lib/db" : "./lib/db",
       },
     ]);
 

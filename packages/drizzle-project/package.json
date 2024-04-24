@@ -9,7 +9,7 @@
     "create-drizzle-project": "dist/cli.js"
   },
   "scripts": {
-    "build": "tsup",
+    "build": "tsup && ncp ./src/templates ./dist/templates",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src"
   },
@@ -22,7 +22,9 @@
   "devDependencies": {
     "@types/fs-extra": "^11.0.4",
     "@types/inquirer": "^9.0.7",
+    "drizzle-orm": "^0.30.9",
     "eslint": "^9.1.1",
+    "ncp": "^2.0.0",
     "tsup": "^8.0.2",
     "tsx": "^4.7.2",
     "typescript": "^5.4.5"
