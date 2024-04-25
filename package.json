@@ -2,7 +2,7 @@
     "name": "drizzle-init-monorepo",
     "private": true,
     "workspaces": [
-        "packages/**/*"
+        "packages/drizzle-project"
     ],
     "scripts": {
         "lint": "turbo run lint"
