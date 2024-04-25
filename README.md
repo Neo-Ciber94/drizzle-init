@@ -1,19 +1,19 @@
 # Drizzle init-project
 
-Initialize drizzle-orm in a project
+Initialize a project with drizzle-orm.
 
 ```bash
-npm init drizzle-project
+npm create drizzle-project
 ```
 
 ```bash
-yarn init drizzle-project
+yarn create drizzle-project
 ```
 
 ```bash
-pnpm init drizzle-project
+pnpm create drizzle-project
 ```
 
 ```bash
-bun init drizzle-project
+bun create drizzle-project
 ```
