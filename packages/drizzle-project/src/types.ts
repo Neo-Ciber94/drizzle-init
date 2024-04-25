@@ -1,6 +1,6 @@
 export const DRIVERS = ["mysql", "postgresql", "sqlite"] as const;
 
-export const MYSQL_DB_PROVIDERS = ["mysql2", "planetscale", "sql.js"] as const;
+export const MYSQL_DB_PROVIDERS = ["mysql2", "planetscale"] as const;
 
 export const POSTGRESTQL_DB_PROVIDERS = [
   "node-postgres",
@@ -9,7 +9,7 @@ export const POSTGRESTQL_DB_PROVIDERS = [
   "pglite",
 ] as const;
 
-export const SQLITE_PROVIDERS = ["better-sqlite3", "turso", "bun"] as const;
+export const SQLITE_PROVIDERS = ["better-sqlite3", "turso", "bun", "sql.js"] as const;
 
 export type Driver = (typeof DRIVERS)[number];
 export type Language = "typescript" | "javascript";

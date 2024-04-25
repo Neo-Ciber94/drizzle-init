@@ -75,10 +75,10 @@ export default async function createCommand(args: InitCommandArgs) {
   console.log("\n");
   console.log(chalk.bold("Dependencies to install:\n"));
 
-  console.log(chalk.bgBlue("dependencies:\n"));
+  console.log(chalk.bgBlue("dependencies:"));
   console.log(dependencies.join("\n"));
 
-  console.log(chalk.bgBlue("devDependencies:\n"));
+  console.log(chalk.bgBlue("devDependencies:"));
   console.log(devDependencies.join("\n"));
   console.log("\n");
 
