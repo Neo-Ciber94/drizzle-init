@@ -6,4 +6,7 @@ export default defineConfig({
   bundle: true,
   minify: true,
   format: ["esm"],
+  define: {
+    "process.env.NODE_ENV": "'production'",
+  },
 });

@@ -1,5 +1,6 @@
 import fse from "fs-extra";
 import path from "path";
+import { Language } from "./types";
 
 let DECTECTED_PACKAGE_MANAGER: PackageManager | undefined | null = undefined;
 
@@ -30,4 +31,24 @@ export async function detectPackageManager(): Promise<PackageManager | null> {
   });
 
   return DECTECTED_PACKAGE_MANAGER ?? null;
+}
+
+export async function detectProjectLanguage(): Promise<Language | null> {
+  const files = await fse.readdir(process.cwd());
+  const isTypescriptProject = files.some((fileName) =>
+    path.basename(fileName).startsWith("tsconfig.")
+  );
+
+  if (isTypescriptProject) {
+    return "typescript";
+  }
+
+  const isJavascriptProject = files.some((fileName) =>
+    path.basename(fileName).startsWith("jsconfig.")
+  );
+  if (isJavascriptProject) {
+    return "javascript";
+  }
+
+  return null;
 }

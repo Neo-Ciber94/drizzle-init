@@ -8,8 +8,14 @@ import spawn from "cross-spawn";
 
 const __dirname = fileURLToPath(import.meta.url);
 const DATABASE_DIR_PLACEHOLDER = "#databaseDir";
-const TEMPLATES_PATH = path.join(__dirname, "..", "templates");
 const RUN_MIGRATION_SCRIPT_PLACEHOLDER = "#runMigration";
+
+// When the code is bundle the template folder will be on the same directory than this
+// in other cases we execute this directly with tsx just for testing
+const TEMPLATES_PATH =
+  process.env.NODE_ENV === "production"
+    ? path.join(__dirname, "templates")
+    : path.join(__dirname, "..", "templates");
 
 const PACKAGE_JSON_SCRIPTS = {
   mysql: {
