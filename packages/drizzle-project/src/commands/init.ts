@@ -49,6 +49,7 @@ export type InitCommandArgs = {
 
 export default async function createCommand(args: InitCommandArgs) {
   const providerDir = path.join(TEMPLATES_PATH, "providers", args.driver, args.dbProvider);
+  const packageManager = await detectPackageManager();
 
   if (!(await fse.exists(providerDir))) {
     throw new Error(
@@ -71,18 +72,22 @@ export default async function createCommand(args: InitCommandArgs) {
   // 5. Install dependencies
   const { dependencies, devDependencies } = getDepsToInstall(providerTemplate, args);
 
-  console.log("\n");
-  console.log(chalk.bold("Dependencies to install:"));
-  console.log(chalk.bgBlue("dependencies:\n"), dependencies.map((dep) => `\t${dep}`).join("\n"));
+  console.log(chalk.bold("Dependencies to install:\n"));
+  console.log(chalk.bgBlue("dependencies:\n"), dependencies.map((dep) => `${dep}`).join("\n"));
   console.log(
     chalk.bgBlue("devDependencies:\n"),
-    devDependencies.map((dep) => `\t${dep}`).join("\n")
+    devDependencies.map((dep) => `${dep}`).join("\n")
   );
-  console.log("\n");
 
   if (args.installDeps) {
     await installDeps({ deps: dependencies, isDev: false });
     await installDeps({ deps: devDependencies, isDev: true });
+  }
+
+  // If no package manager was detected, probably the script was called on an empty folder,
+  // this is an edge case we don't cover currently, we expected the CLI be used on an existing project
+  if (packageManager == null) {
+    await updatePackageJsonScripts(providerDir, providerTemplate, args);
   }
 }
 
@@ -114,7 +119,7 @@ interface DatabaseProviderTemplate {
   databaseDriverContents: string;
   drizzleConfigContents: string;
   migrateFileContents: string;
-  packageJson: PackageJson;
+  providerPackageJson: PackageJson;
 }
 
 async function ensureCanWriteFiles(args: InitCommandArgs) {
@@ -157,8 +162,10 @@ async function readDatabaseProviderTemplate(
 
   try {
     const databaseSchemaContents = await fse.readFile(schemaFile, "utf-8");
-    const packageJson: PackageJson = await fse.readJson(path.join(providerDir, "package.json"));
-    const configFile = packageJson.drizzle?.config;
+    const providerPackageJson: PackageJson = await fse.readJson(
+      path.join(providerDir, "package.json")
+    );
+    const configFile = providerPackageJson.drizzle?.config;
 
     if (!configFile) {
       throw new Error(`package.json drizzle.config section was not defined for '${providerDir}'`);
@@ -178,7 +185,7 @@ async function readDatabaseProviderTemplate(
       drizzleConfigContents,
       migrateFileContents,
       databaseDriverContents,
-      packageJson,
+      providerPackageJson,
     };
   } catch (err) {
     console.error(
@@ -227,20 +234,27 @@ async function updatePackageJsonScripts(
     throw new Error(`Unable to find database scripts for ${args.driver}`);
   }
 
-  const newPackageJson = structuredClone(template.packageJson);
-  newPackageJson.scripts ??= {}; // ensure no empty
+  const packageFilePath = path.join(process.cwd(), "package.json");
+
+  if (!(await fse.exists(packageFilePath))) {
+    return;
+  }
+
+  const packageJson: PackageJson = await fse.readJSON(packageFilePath);
+  packageJson.scripts ??= {}; // ensure no empty
 
   const runMigration =
     args.configType === "javascript" ? `node ${args.migrateFile}` : `npx tsx ${args.migrateFile}`;
 
-  newPackageJson.scripts = {
-    ...newPackageJson.scripts,
+  packageJson.scripts = {
+    ...packageJson.scripts,
     ["db:push"]: dbScripts["db:push"],
     ["db:generate"]: dbScripts["db:generate"],
     ["db:migrate"]: dbScripts["db:migrate"].replace(RUN_MIGRATION_SCRIPT_PLACEHOLDER, runMigration),
   };
 
-  await fse.writeJSON(path.join(providerDir, "package.json"), newPackageJson);
+  // TODO: format with prettier
+  await fse.writeJSON(packageFilePath, packageJson, { spaces: 2 });
 }
 
 function replaceDatabaseDirPlaceholder(contents: string, args: InitCommandArgs) {
@@ -251,13 +265,13 @@ function getDepsToInstall(template: DatabaseProviderTemplate, args: InitCommandA
   const dependencies: string[] = [];
   const devDependencies: string[] = [];
 
-  if (template.packageJson.dependencies) {
-    const deps = Object.keys(template.packageJson.dependencies);
+  if (template.providerPackageJson.dependencies) {
+    const deps = Object.keys(template.providerPackageJson.dependencies);
     dependencies.push(...deps);
   }
 
-  if (template.packageJson.devDependencies) {
-    const deps = Object.keys(template.packageJson.devDependencies);
+  if (template.providerPackageJson.devDependencies) {
+    const deps = Object.keys(template.providerPackageJson.devDependencies);
     devDependencies.push(...deps);
   }
 
