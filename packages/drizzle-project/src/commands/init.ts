@@ -78,6 +78,7 @@ export default async function createCommand(args: InitCommandArgs) {
   console.log(chalk.bgBlue("dependencies:"));
   console.log(dependencies.join("\n"));
 
+  console.log("\n");
   console.log(chalk.bgBlue("devDependencies:"));
   console.log(devDependencies.join("\n"));
   console.log("\n");
