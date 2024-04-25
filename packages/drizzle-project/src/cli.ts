@@ -12,6 +12,7 @@ import {
   POSTGRESTQL_DB_PROVIDERS,
   SQLITE_PROVIDERS,
 } from "./types";
+import { detectPackageManager } from "./utils";
 
 const command = new Command()
   .description(packageJson.description)
@@ -20,6 +21,7 @@ const command = new Command()
     const hasSrcDirectory = await fse.exists(path.join(process.cwd(), "src"));
     const hasAppDirectory = await fse.exists(path.join(process.cwd(), "app"));
     const projectLang = await guestProjectLanguage();
+    const packageManager = (await detectPackageManager()) ?? "npm";
 
     const args: InitCommandArgs = await inquirer.prompt([
       {
@@ -54,12 +56,12 @@ const command = new Command()
         default: projectLang ?? "typescript",
         type: "list",
         choices: [
-          { name: "javascript", value: chalk.yellowBright("Javascript") },
-          { name: "typescript", value: chalk.blueBright("Typescript") },
-        ] satisfies { name: Language; value: string }[],
+          { value: "typescript", name: chalk.blueBright("Typescript") },
+          { value: "javascript", name: chalk.yellowBright("Javascript") },
+        ] satisfies { value: Language; name: string }[],
       },
       {
-        name: "migrateDir",
+        name: "migrateFile",
         message: "Migrate file location",
         default() {
           switch (projectLang) {
@@ -101,7 +103,7 @@ const command = new Command()
       },
       {
         name: "installDeps",
-        message: "Install dependencies?",
+        message: `Install dependencies? (${packageManager} install)`,
         type: "confirm",
         default: true,
       },
@@ -131,6 +133,6 @@ async function guestProjectLanguage(): Promise<Language | null> {
 }
 
 command.parseAsync().catch((error) => {
-  console.error(chalk.red("Failed to initialize drizzle"), error);
+  console.error(chalk.red("Failed to initialize drizzle\n\n"), error);
   process.exit(1);
 });

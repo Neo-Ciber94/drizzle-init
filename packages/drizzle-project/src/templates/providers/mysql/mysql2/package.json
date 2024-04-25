@@ -1,17 +1,1 @@
-{
-  "name": "mysql2-provider",
-  "version": "0.0.1",
-  "description": "Drizzle mysql2 database provider template",
-  "license": "MIT",
-  "private": true,
-  "drizzle": {
-    "config": "mysql2"
-  },
-  "dependencies": {
-    "drizzle-orm": "^0.30.9",
-    "mysql2": "^3.9.7"
-  },
-  "devDependencies": {
-    "drizzle-kit": "^0.20.17"
-  }
-}
+{"name":"mysql2-provider","version":"0.0.1","description":"Drizzle mysql2 database provider template","license":"MIT","private":true,"drizzle":{"config":"mysql2"},"dependencies":{"drizzle-orm":"^0.30.9","mysql2":"^3.9.7"},"devDependencies":{"drizzle-kit":"^0.20.17"},"scripts":{"db:push":"npx drizzle-kit push:mysql","db:generate":"npx drizzle-kit generate:mysql","db:migrate":"npx tsx ./migrate.ts"}}

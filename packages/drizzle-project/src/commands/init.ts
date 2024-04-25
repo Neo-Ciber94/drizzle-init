@@ -70,11 +70,15 @@ export default async function createCommand(args: InitCommandArgs) {
 
   // 5. Install dependencies
   const { dependencies, devDependencies } = getDepsToInstall(providerTemplate, args);
-  console.log(chalk.bgYellow("dependencies: \n\t"), dependencies.join(" "));
+
   console.log("\n");
-  console.log(chalk.bgYellow("devDependencies: \n\t"), devDependencies.join(" "));
+  console.log(chalk.bold("Dependencies to install:"));
+  console.log(chalk.bgBlue("dependencies:\n"), dependencies.map((dep) => `\t${dep}`).join("\n"));
+  console.log(
+    chalk.bgBlue("devDependencies:\n"),
+    devDependencies.map((dep) => `\t${dep}`).join("\n")
+  );
   console.log("\n");
-  console.log("\n\n");
 
   if (args.installDeps) {
     await installDeps({ deps: dependencies, isDev: false });
@@ -165,15 +169,9 @@ async function readDatabaseProviderTemplate(
       "utf-8"
     );
 
-    const databaseDriverContents = await fse.readFile(
-      path.join(TEMPLATES_PATH, providerDir, "index.ts"),
-      "utf-8"
-    );
+    const databaseDriverContents = await fse.readFile(path.join(providerDir, "index.ts"), "utf-8");
 
-    const migrateFileContents = await fse.readFile(
-      path.join(TEMPLATES_PATH, providerDir, "migrate.ts"),
-      "utf-8"
-    );
+    const migrateFileContents = await fse.readFile(path.join(providerDir, "migrate.ts"), "utf-8");
 
     return {
       databaseSchemaContents,
@@ -184,7 +182,7 @@ async function readDatabaseProviderTemplate(
     };
   } catch (err) {
     console.error(
-      chalk.red(`Failed to read '${args.driver}' template for provider '${args.dbProvider}'\n\n`)
+      chalk.red(`Failed to read '${args.driver}' template for provider '${args.dbProvider}'`)
     );
     throw err;
   }
@@ -199,6 +197,8 @@ async function writeDatabaseProviderTemplate(
   const migrateFilePath = path.join(process.cwd(), `${args.migrateFile}`);
   const schemaFilePath = path.join(process.cwd(), args.databaseDir, `schema.${extension}`);
   const databaseFilePath = path.join(process.cwd(), args.databaseDir, `index.${extension}`);
+
+  console.log("\n");
 
   // drizzle.config.{ts|js}
   await safeWriteFile(configFilePath, template.drizzleConfigContents);
