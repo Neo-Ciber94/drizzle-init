@@ -6,7 +6,7 @@ import chalk from "chalk";
 import { detectPackageManager } from "../utils";
 import spawn from "cross-spawn";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const __dirname = fileURLToPath(import.meta.url);
 const DATABASE_DIR_PLACEHOLDER = "#databaseDir";
 const TEMPLATES_PATH = path.join(__dirname, "..", "templates");
 const RUN_MIGRATION_SCRIPT_PLACEHOLDER = "#runMigration";
