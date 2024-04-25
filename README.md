@@ -3,17 +3,17 @@
 Initialize a project with drizzle-orm.
 
 ```bash
-npm create drizzle-project
+npm create drizzle-project@latest
 ```
 
 ```bash
-yarn create drizzle-project
+yarn create drizzle-project@latest
 ```
 
 ```bash
-pnpm create drizzle-project
+pnpm create drizzle-project@latest
 ```
 
 ```bash
-bun create drizzle-project
+bun create drizzle-project@latest
 ```
