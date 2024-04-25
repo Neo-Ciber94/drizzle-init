@@ -1,18 +1,30 @@
 {
   "name": "drizzle-project",
-  "version": "0.0.1",
-  "description": "Initialize drizzle in a project",
-  "main": "index.js",
-  "author": "Freddy L.",
+  "version": "0.0.1-beta1",
+  "description": "Initialize drizzle-orm in a project",
+  "author": "NeoCiber",
   "license": "MIT",
+  "main": "dist/cli.js",
   "bin": "dist/cli.js",
+  "keywords": [
+    "drizzle-orm",
+    "database",
+    "sql",
+    "mysql",
+    "postgresql",
+    "sqlite"
+  ],
   "scripts": {
     "build": "tsup && ncp ./src/templates ./dist/templates",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint src"
+    "lint": "eslint src",
+    "prepublishOnly": "yarn typecheck && yarn build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Neo-Ciber94/drizzle-init"
   },
   "dependencies": {
-    "@types/cross-spawn": "^6.0.6",
     "chalk": "^5.3.0",
     "commander": "^12.0.0",
     "cross-spawn": "^7.0.3",
@@ -20,14 +32,28 @@
     "inquirer": "^9.2.19"
   },
   "devDependencies": {
+    "@types/cross-spawn": "^6.0.6",
     "@types/fs-extra": "^11.0.4",
     "@types/inquirer": "^9.0.7",
-    "drizzle-kit": "^0.20.17",
-    "drizzle-orm": "^0.30.9",
     "eslint": "^9.1.1",
     "ncp": "^2.0.0",
     "tsup": "^8.0.2",
     "tsx": "^4.7.2",
     "typescript": "^5.4.5"
-  }
+  },
+  "peerDependencies": {
+    "drizzle-kit": "^0.20.17",
+    "drizzle-orm": "^0.30.9"
+  },
+  "peerDependenciesMeta": {
+    "drizzle-kit": {
+      "optional": true
+    },
+    "drizzle-orm": {
+      "optional": true
+    }
+  },
+  "files": [
+    "dist"
+  ]
 }
