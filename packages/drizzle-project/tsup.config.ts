@@ -1,8 +1,8 @@
 import { defineConfig } from "tsup";
 
 export default defineConfig({
-  entry: ["src", "!src/**/*.test.*", "!src/templates"],
+  entry: ["src/cli.ts", "!src/**/*.test.*", "!src/templates"],
   clean: true,
-  splitting: false,
+  bundle: true,
   format: ["esm"],
 });

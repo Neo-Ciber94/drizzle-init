@@ -3,5 +3,5 @@
 Initialize a project with drizzle-orm.
 
 ```bash
-npm create drizzle-project@latest
+npm init drizzle-project@latest
 ```
