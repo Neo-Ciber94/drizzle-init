@@ -212,10 +212,13 @@ async function writeDatabaseProviderTemplate(
   console.log("\n");
 
   // drizzle.config.{ts|js}
-  await safeWriteFile(
-    configFilePath,
-    replaceDatabaseDirPlaceholder(template.drizzleConfigContents, args)
-  );
+  let configContents = replaceDatabaseDirPlaceholder(template.drizzleConfigContents, args);
+
+  if (args.configType === "javascript") {
+    configContents = configContents.replace("schema.ts", "schema.js");
+  }
+
+  await safeWriteFile(configFilePath, configContents);
 
   // db/schema.{ts|js}
   await safeWriteFile(schemaFilePath, template.databaseSchemaContents);
