@@ -59,9 +59,16 @@ const command = new Command()
         ] satisfies { name: Language; value: string }[],
       },
       {
-        name: "migrateFile",
+        name: "migrateDir",
         message: "Migrate file location",
-        default: "./migrate.ts",
+        default() {
+          switch (projectLang) {
+            case "javascript":
+              return "./migrate.js";
+            default:
+              return "./migrate.ts";
+          }
+        },
         async validate(input) {
           if (path.isAbsolute(input)) {
             return "Migrate file path should be relative to the current dir";
@@ -91,6 +98,12 @@ const command = new Command()
 
           return "./lib/db";
         },
+      },
+      {
+        name: "installDeps",
+        message: "Install dependencies?",
+        type: "confirm",
+        default: true,
       },
     ]);
 
