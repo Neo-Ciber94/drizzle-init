@@ -72,12 +72,11 @@ export default async function createCommand(args: InitCommandArgs) {
   // 5. Install dependencies
   const { dependencies, devDependencies } = getDepsToInstall(providerTemplate, args);
 
+  console.log("\n");
   console.log(chalk.bold("Dependencies to install:\n"));
-  console.log(chalk.bgBlue("dependencies:\n"), dependencies.map((dep) => `${dep}`).join("\n"));
-  console.log(
-    chalk.bgBlue("devDependencies:\n"),
-    devDependencies.map((dep) => `${dep}`).join("\n")
-  );
+  console.log(chalk.bgBlue("dependencies:\n"), dependencies.join("\n"));
+  console.log(chalk.bgBlue("devDependencies:\n"), devDependencies.join("\n"));
+  console.log("\n");
 
   if (args.installDeps) {
     await installDeps({ deps: dependencies, isDev: false });
