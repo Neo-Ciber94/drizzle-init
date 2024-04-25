@@ -63,8 +63,9 @@ const command = new Command()
       {
         name: "migrateFile",
         message: "Migrate file location",
-        default() {
-          switch (projectLang) {
+        default(answers: { configType: string }) {
+          const lang = answers.configType === "javascript" ? "javascript" : "typescript";
+          switch (lang) {
             case "javascript":
               return "./migrate.js";
             default:

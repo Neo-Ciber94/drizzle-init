@@ -4,7 +4,7 @@
   "description": "Drizzle better-sqlite3 database provider template",
   "license": "MIT",
   "drizzle": {
-    "config": "better-sqlite3"
+    "config": "better-sqlite"
   },
   "dependencies": {
     "better-sqlite3": "^9.5.0",
