@@ -1,11 +1,12 @@
 {
   "name": "create-drizzle-project",
-  "version": "0.0.1-beta1",
+  "version": "0.0.1-beta2",
   "description": "Initialize drizzle-orm in a project",
   "author": "NeoCiber",
   "license": "MIT",
-  "main": "dist/cli.js",
-  "bin": "dist/cli.js",
+  "bin": {
+    "create-drizzle-project": "./dist/cli.js"
+  },
   "keywords": [
     "drizzle-orm",
     "database",
