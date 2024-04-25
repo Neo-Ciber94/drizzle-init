@@ -1,6 +1,6 @@
 {
   "name": "create-drizzle-project",
-  "version": "0.0.1-beta4",
+  "version": "0.0.1-beta5",
   "description": "Initialize drizzle-orm in a project",
   "author": "NeoCiber",
   "license": "MIT",
