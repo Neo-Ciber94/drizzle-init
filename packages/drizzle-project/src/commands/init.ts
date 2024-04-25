@@ -67,15 +67,19 @@ export default async function createCommand(args: InitCommandArgs) {
   await writeDatabaseProviderTemplate(providerTemplate, args);
 
   // 4. Update package.json database scripts
-  await updatePackageJsonScripts(providerDir, providerTemplate, args);
+  await updatePackageJsonScripts(args);
 
   // 5. Install dependencies
   const { dependencies, devDependencies } = getDepsToInstall(providerTemplate, args);
 
   console.log("\n");
   console.log(chalk.bold("Dependencies to install:\n"));
-  console.log(chalk.bgBlue("dependencies:\n"), dependencies.join("\n"));
-  console.log(chalk.bgBlue("devDependencies:\n"), devDependencies.join("\n"));
+
+  console.log(chalk.bgBlue("dependencies:\n"));
+  console.log(dependencies.join("\n"));
+
+  console.log(chalk.bgBlue("devDependencies:\n"));
+  console.log(devDependencies.join("\n"));
   console.log("\n");
 
   if (args.installDeps) {
@@ -86,7 +90,7 @@ export default async function createCommand(args: InitCommandArgs) {
   // If no package manager was detected, probably the script was called on an empty folder,
   // this is an edge case we don't cover currently, we expected the CLI be used on an existing project
   if (packageManager == null) {
-    await updatePackageJsonScripts(providerDir, providerTemplate, args);
+    await updatePackageJsonScripts(args);
   }
 }
 
@@ -207,7 +211,10 @@ async function writeDatabaseProviderTemplate(
   console.log("\n");
 
   // drizzle.config.{ts|js}
-  await safeWriteFile(configFilePath, template.drizzleConfigContents);
+  await safeWriteFile(
+    configFilePath,
+    replaceDatabaseDirPlaceholder(template.drizzleConfigContents, args)
+  );
 
   // db/schema.{ts|js}
   await safeWriteFile(schemaFilePath, template.databaseSchemaContents);
@@ -222,11 +229,7 @@ async function writeDatabaseProviderTemplate(
   );
 }
 
-async function updatePackageJsonScripts(
-  providerDir: string,
-  template: DatabaseProviderTemplate,
-  args: InitCommandArgs
-) {
+async function updatePackageJsonScripts(args: InitCommandArgs) {
   const dbScripts = PACKAGE_JSON_SCRIPTS[args.driver];
 
   if (!dbScripts) {
