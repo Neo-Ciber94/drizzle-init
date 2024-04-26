@@ -168,7 +168,6 @@ async function run(init: Partial<InitCommandArgs>) {
       .then((x) => x.installDeps);
   }
 
-  console.log({ init });
   await initCommand(init as InitCommandArgs);
 }
 

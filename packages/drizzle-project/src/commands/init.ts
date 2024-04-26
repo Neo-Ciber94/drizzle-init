@@ -54,7 +54,6 @@ export default async function createCommand(args: InitCommandArgs) {
   const providerDir = path.join(TEMPLATES_PATH, "providers", args.driver, args.dbProvider);
   const packageManager = await detectPackageManager();
 
-  console.log({ providerDir, isProd: process.env.NODE_ENV });
   if (!(await fse.exists(providerDir))) {
     throw new Error(
       `Database provider '${args.dbProvider}' for '${args.driver}' is not implemented yet`
