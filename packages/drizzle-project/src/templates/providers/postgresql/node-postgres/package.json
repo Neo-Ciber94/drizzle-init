@@ -1,15 +1,15 @@
 {
-  "name": "neon-http-provider",
+  "name": "node-postgres-provider",
   "version": "0.0.1",
-  "description": "Drizzle postgresql neon-http database provider template",
+  "description": "Drizzle node-postgres database provider template",
   "license": "MIT",
   "private": true,
   "drizzle": {
     "config": "pg"
   },
   "dependencies": {
-    "@neondatabase/serverless": "^0.9.1",
-    "drizzle-orm": "^0.30.9"
+    "drizzle-orm": "^0.30.9",
+    "pg": "^8.11.5"
   },
   "devDependencies": {
     "drizzle-kit": "^0.20.17"
