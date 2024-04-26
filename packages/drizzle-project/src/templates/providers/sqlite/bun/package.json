@@ -8,10 +8,10 @@
   },
   "dependencies": {
     "@libsql/client": "^0.6.0",
-    "@types/bun": "^1.1.0",
     "drizzle-orm": "^0.30.9"
   },
   "devDependencies": {
-    "drizzle-kit": "^0.20.17"
+    "drizzle-kit": "^0.20.17",
+    "@types/bun": "^1.1.0"
   }
 }
