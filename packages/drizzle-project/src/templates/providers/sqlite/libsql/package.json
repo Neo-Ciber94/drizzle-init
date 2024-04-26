@@ -1,0 +1,16 @@
+{
+  "name": "libsql-provider",
+  "version": "0.0.1",
+  "description": "Drizzle sqlite libsql database provider template",
+  "license": "MIT",
+  "drizzle": {
+    "config": "libsql"
+  },
+  "dependencies": {
+    "@libsql/client": "^0.6.0",
+    "drizzle-orm": "^0.30.9"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.20.17"
+  }
+}

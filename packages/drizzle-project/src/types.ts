@@ -9,7 +9,7 @@ export const POSTGRESTQL_DB_PROVIDERS = [
   "pglite",
 ] as const;
 
-export const SQLITE_PROVIDERS = ["better-sqlite3", "libsql", "bun", "sql.js"] as const;
+export const SQLITE_PROVIDERS = ["better-sqlite3", "libsql", "turso", "bun", "sql.js"] as const;
 
 export type Driver = (typeof DRIVERS)[number];
 export type Language = "typescript" | "javascript";
