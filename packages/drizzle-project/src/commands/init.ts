@@ -50,7 +50,7 @@ export type InitCommandArgs = {
   installDeps: boolean;
 };
 
-export default async function createCommand(args: InitCommandArgs) {
+export default async function initCommand(args: InitCommandArgs) {
   const providerDir = path.join(TEMPLATES_PATH, "providers", args.driver, args.dbProvider);
   const packageManager = await detectPackageManager();
 
@@ -59,6 +59,9 @@ export default async function createCommand(args: InitCommandArgs) {
       `Database provider '${args.dbProvider}' for '${args.driver}' is not implemented yet`
     );
   }
+
+  // Sanitize paths
+  args.databaseDir = sanitizePath(args.databaseDir);
 
   // 1. Check if can write template files to ensure not overwriting existing ones
   await ensureCanWriteFiles(args);
@@ -262,7 +265,7 @@ async function updatePackageJsonScripts(args: InitCommandArgs) {
     ["db:migrate"]: dbScripts["db:migrate"].replace(RUN_MIGRATION_SCRIPT_PLACEHOLDER, runMigration),
   };
 
-  // TODO: format with prettier
+  // TODO: format with prettier?
   await fse.writeJSON(packageFilePath, packageJson, { spaces: 2 });
 }
 
@@ -307,4 +310,12 @@ async function safeWriteFile(filePath: string, content: string) {
   const dirname = path.dirname(filePath);
   await fse.ensureDir(dirname);
   await fse.writeFile(filePath, content);
+}
+
+function sanitizePath(pathName: string) {
+  if (pathName.endsWith("/")) {
+    return pathName.slice(0, -1);
+  }
+
+  return pathName;
 }
