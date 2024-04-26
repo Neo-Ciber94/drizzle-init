@@ -1,5 +1,7 @@
 # Drizzle init-project
 
+[![CI](https://github.com/Neo-Ciber94/drizzle-init/actions/workflows/ci.yml/badge.svg)](https://github.com/Neo-Ciber94/drizzle-init/actions/workflows/ci.yml)
+
 Initialize a project with drizzle-orm.
 
 ```bash
