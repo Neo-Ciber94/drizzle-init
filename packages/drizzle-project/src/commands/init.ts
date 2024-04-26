@@ -1,10 +1,10 @@
 import fse from "fs-extra";
 import path from "path";
-import type { Driver, Language, DbProvider } from "../types";
 import { fileURLToPath } from "url";
 import chalk from "chalk";
-import { detectPackageManager } from "../utils";
 import spawn from "cross-spawn";
+import type { Driver, Language, DbProvider } from "../types";
+import { detectPackageManager } from "../utils";
 
 const __dirname = fileURLToPath(import.meta.url);
 const DATABASE_DIR_PLACEHOLDER = "#databaseDir";
