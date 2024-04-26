@@ -5,3 +5,24 @@ Initialize a project with drizzle-orm.
 ```bash
 npm init drizzle-project@latest
 ```
+
+## Usage
+
+```bash
+create-drizzle-project [options]
+```
+
+```bash
+Initialize drizzle-orm in a project
+
+Options:
+  -V, --version               output the version number
+  -d, --driver <string>       Database driver to use (mysql, postgres, sqlite)
+  -p, --dbProvider <string>   Database provider to use
+  -c, --configType <string>   Drizzle config file type (typescript, javascript)
+  -m, --migrateFile <string>  Migration file path
+  -b, --databaseDir <string>  Directory for the database and schema files
+  -i, --install               Whether if install the dependencies
+  --no-install                No install dependencies
+  -h, --help                  display help for command
+```
