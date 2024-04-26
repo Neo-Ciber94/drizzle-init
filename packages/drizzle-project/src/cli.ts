@@ -38,7 +38,7 @@ const command = new Command()
     "Drizzle config file type (typescript, javascript)",
     parseOption(validateConfigType)
   )
-  .option("-m, --migrationFile <string>", "Migration file path", parseOption(validateMigrationFile))
+  .option("-m, --migrateFile <string>", "Migration file path", parseOption(validateMigrationFile))
   .option("-b, --databaseDir <string>", "Directory for the database and schema files")
   .option("-i, --installDeps", "Whether if install the dependencies");
 
@@ -111,7 +111,7 @@ async function run(init: Partial<InitCommandArgs>) {
       .then((x) => x.configType);
   }
 
-  if (!init.configType) {
+  if (!init.migrateFile) {
     init.migrateFile = await inquirer
       .prompt({
         name: "migrateFile",
@@ -157,7 +157,7 @@ async function run(init: Partial<InitCommandArgs>) {
       .then((x) => x.databaseDir);
   }
 
-  if (!init.databaseDir) {
+  if (init.installDeps == null) {
     init.installDeps = await inquirer
       .prompt({
         name: "installDeps",

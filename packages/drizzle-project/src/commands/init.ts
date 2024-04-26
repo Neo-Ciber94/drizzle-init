@@ -12,10 +12,7 @@ const RUN_MIGRATION_SCRIPT_PLACEHOLDER = "#runMigration";
 
 // When the code is bundle the template folder will be on the same directory than this
 // in other cases we execute this directly with tsx just for testing
-const TEMPLATES_PATH =
-  process.env.NODE_ENV === "production"
-    ? path.join(__dirname, "templates")
-    : path.join(__dirname, "..", "templates");
+const TEMPLATES_PATH = path.join(__dirname, "..", "templates");
 
 const PACKAGE_JSON_SCRIPTS = {
   mysql: {
@@ -57,6 +54,7 @@ export default async function createCommand(args: InitCommandArgs) {
   const providerDir = path.join(TEMPLATES_PATH, "providers", args.driver, args.dbProvider);
   const packageManager = await detectPackageManager();
 
+  console.log({ providerDir, isProd: process.env.NODE_ENV });
   if (!(await fse.exists(providerDir))) {
     throw new Error(
       `Database provider '${args.dbProvider}' for '${args.driver}' is not implemented yet`

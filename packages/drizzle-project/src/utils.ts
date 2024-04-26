@@ -1,6 +1,6 @@
 import fse from "fs-extra";
 import path from "path";
-import { Language } from "./types";
+import { type Language } from "./types";
 
 let DECTECTED_PACKAGE_MANAGER: PackageManager | undefined | null = undefined;
 
