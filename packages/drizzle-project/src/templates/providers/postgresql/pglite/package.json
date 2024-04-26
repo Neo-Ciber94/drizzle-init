@@ -1,0 +1,17 @@
+{
+  "name": "pglite-provider",
+  "version": "0.0.1",
+  "description": "Drizzle postgresql pglite database provider template",
+  "license": "MIT",
+  "private": true,
+  "drizzle": {
+    "config": "pg"
+  },
+  "dependencies": {
+    "@electric-sql/pglite": "^0.1.5",
+    "drizzle-orm": "^0.30.9"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.20.17"
+  }
+}
