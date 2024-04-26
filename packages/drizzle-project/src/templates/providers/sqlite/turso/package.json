@@ -1,13 +1,13 @@
 {
-  "name": "better-sqlite3-provider",
+  "name": "turso-provider",
   "version": "0.0.1",
-  "description": "Drizzle better-sqlite3 database provider template",
+  "description": "Drizzle sqlite turso database provider template",
   "license": "MIT",
   "drizzle": {
-    "config": "better-sqlite"
+    "config": "turso"
   },
   "dependencies": {
-    "better-sqlite3": "^9.5.0",
+    "@libsql/client": "^0.6.0",
     "drizzle-orm": "^0.30.9"
   },
   "devDependencies": {
