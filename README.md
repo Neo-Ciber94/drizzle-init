@@ -8,11 +8,9 @@ npm init drizzle-project@latest
 
 ## Usage
 
-```bash
-create-drizzle-project [options]
-```
+```text
+Usage: create-drizzle-project [options]
 
-```bash
 Initialize drizzle-orm in a project
 
 Options:
