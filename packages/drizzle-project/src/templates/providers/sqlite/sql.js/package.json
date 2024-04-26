@@ -1,0 +1,17 @@
+{
+  "name": "sqljs-provider",
+  "version": "0.0.1",
+  "description": "Drizzle sql.js database provider template",
+  "license": "MIT",
+  "drizzle": {
+    "config": "better-sqlite"
+  },
+  "dependencies": {
+    "sql.js": "^1.10.3",
+    "drizzle-orm": "^0.30.9"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.20.17",
+    "@types/sql.js": "^1.4.9"
+  }
+}

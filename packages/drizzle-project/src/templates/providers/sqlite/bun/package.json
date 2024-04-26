@@ -1,7 +1,7 @@
 {
-  "name": "libsql-provider",
+  "name": "bun-provider",
   "version": "0.0.1",
-  "description": "Drizzle sqlite libsql database provider template",
+  "description": "Drizzle sqlite bun database provider template",
   "license": "MIT",
   "drizzle": {
     "config": "better-sqlite"
