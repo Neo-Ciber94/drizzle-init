@@ -1,0 +1,17 @@
+{
+  "name": "postgresjs-provider",
+  "version": "0.0.1",
+  "description": "Drizzle postgres-js database provider template",
+  "license": "MIT",
+  "private": true,
+  "drizzle": {
+    "config": "pg"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.30.9",
+    "postgres": "^3.4.4"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.20.17"
+  }
+}

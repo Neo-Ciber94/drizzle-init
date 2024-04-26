@@ -5,7 +5,7 @@ export const MYSQL_DB_PROVIDERS = ["mysql2", "planetscale"] as const;
 export const POSTGRESTQL_DB_PROVIDERS = [
   "node-postgres",
   "neon-http",
-  "supabase",
+  "postgres-js",
   "pglite",
 ] as const;
 
