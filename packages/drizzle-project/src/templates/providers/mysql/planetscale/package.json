@@ -1,0 +1,17 @@
+{
+    "name": "planetscale-provider",
+    "version": "0.0.1",
+    "description": "Drizzle planetscale database provider template",
+    "license": "MIT",
+    "private": true,
+    "drizzle": {
+        "config": "mysql2"
+    },
+    "dependencies": {
+        "@planetscale/database": "^1.16.0",
+        "drizzle-orm": "^0.30.9"
+    },
+    "devDependencies": {
+        "drizzle-kit": "^0.20.17"
+    }
+}
