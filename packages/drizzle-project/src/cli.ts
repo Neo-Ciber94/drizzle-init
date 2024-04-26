@@ -23,6 +23,10 @@ import {
   type ValidatorResult,
 } from "./validators";
 
+type Options = Partial<InitCommandArgs> & {
+  install?: boolean;
+};
+
 const command = new Command()
   .name(packageJson.name)
   .description(packageJson.description)
@@ -40,7 +44,8 @@ const command = new Command()
   )
   .option("-m, --migrateFile <string>", "Migration file path", parseOption(validateMigrationFile))
   .option("-b, --databaseDir <string>", "Directory for the database and schema files")
-  .option("-i, --installDeps", "Whether if install the dependencies");
+  .option("-i, --install", "Whether if install the dependencies")
+  .option("--no-install", "No install dependencies");
 
 function parseOption(validator: (value: string) => ValidatorResult<unknown>) {
   return (arg: string) => {
@@ -54,7 +59,7 @@ function parseOption(validator: (value: string) => ValidatorResult<unknown>) {
   };
 }
 
-async function run(init: Partial<InitCommandArgs>) {
+async function run(init: Options) {
   const hasSrcDirectory = await fse.exists(path.join(process.cwd(), "src"));
   const hasAppDirectory = await fse.exists(path.join(process.cwd(), "app"));
   const projectLang = await detectProjectLanguage();
@@ -157,6 +162,8 @@ async function run(init: Partial<InitCommandArgs>) {
       .then((x) => x.databaseDir);
   }
 
+  init.installDeps = init.install;
+
   if (init.installDeps == null) {
     init.installDeps = await inquirer
       .prompt({
@@ -174,7 +181,7 @@ async function run(init: Partial<InitCommandArgs>) {
 command
   .parseAsync()
   .then((program) => {
-    const opts = program.opts<Partial<InitCommandArgs>>();
+    const opts = program.opts<Options>();
     return run(opts);
   })
   .catch((error) => {
