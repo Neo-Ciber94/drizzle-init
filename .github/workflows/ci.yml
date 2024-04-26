@@ -1,0 +1,31 @@
+
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18.x
+        cache: 'yarn'
+
+    - name: Install
+      run: yarn install --frozen-lockfile
+
+    - name: Build
+      run: cd packages/drizzle-project && yarn build
+
+    - name: Typecheck
+      run: yarn run typecheck
+
+    - name: Lint
+      run: yarn run lint
