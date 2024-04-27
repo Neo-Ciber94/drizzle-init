@@ -21,6 +21,7 @@ Options:
   -p, --dbProvider <string>   Database provider to use
   -c, --configType <string>   Drizzle config file type (typescript, javascript)
   -m, --migrateFile <string>  Migration file path
+  -o, --outDir <string>       Output directory (default: "./drizzle")
   -b, --databaseDir <string>  Directory for the database and schema files
   -i, --install               Whether if install the dependencies
   --no-install                No install dependencies
