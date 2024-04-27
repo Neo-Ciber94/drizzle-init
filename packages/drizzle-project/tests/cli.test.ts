@@ -255,7 +255,7 @@ describe("Run cli with customs options", () => {
     await npmDbGenerate(tempDir);
 
     await expect(fse.exists(path.join(tempDir, "./drizzle.config.ts"))).resolves.toBeTruthy();
-    await expect(fse.exists(path.join(tempDir, "./db/migrate.ts"))).resolves.toBeTruthy();
+    await expect(fse.exists(path.join(tempDir, "./db/migrator.ts"))).resolves.toBeTruthy();
     await expect(fse.exists(path.join(tempDir, "./db/index.ts"))).resolves.toBeTruthy();
     await expect(fse.exists(path.join(tempDir, "./db/schema.ts"))).resolves.toBeTruthy();
     await expect(
