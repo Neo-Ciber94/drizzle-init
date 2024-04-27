@@ -90,8 +90,20 @@ export default async function initCommand(args: InitCommandArgs) {
   console.log("\n");
 
   if (args.installDeps) {
-    await installDeps({ deps: dependencies, isDev: false });
-    await installDeps({ deps: devDependencies, isDev: true });
+    try {
+      await installDeps({ deps: dependencies, isDev: false });
+      await installDeps({ deps: devDependencies, isDev: true });
+    } catch (cause) {
+      if (cause instanceof Error) {
+        const packageManager = (await detectPackageManager()) ?? "npm";
+        let installError = `Failed to run:\n\n`;
+        installError += `${packageManager} add ${dependencies.join(" ")}\n`;
+        installError += `${packageManager} add -D ${devDependencies.join(" ")}\n`;
+        throw new Error(installError, { cause });
+      }
+
+      throw cause;
+    }
   }
 
   // If no package manager was detected, probably the script was called on an empty folder,
@@ -103,7 +115,7 @@ export default async function initCommand(args: InitCommandArgs) {
 
 async function installDeps({ isDev, deps }: { isDev: boolean; deps: string[] }) {
   const packageManager = (await detectPackageManager()) ?? "npm";
-  const args: string[] = ["install"];
+  const args: string[] = ["add"];
 
   if (isDev) {
     args.push("-D");
