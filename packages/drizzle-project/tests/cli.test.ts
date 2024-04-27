@@ -95,7 +95,7 @@ async function runDrizzleInitProject(cwd: string, opts: Options) {
     }
   }
 
-  return runCommand({ cwd, cmd: "node", args, isFile: true });
+  return runCommand({ cwd, cmd: "node", args });
 }
 
 async function runCommand({
