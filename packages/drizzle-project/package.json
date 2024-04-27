@@ -20,7 +20,7 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint src",
     "test": "vitest --run",
-    "prepublishOnly": "yarn typecheck && yarn build",
+    "prepublishOnly": "yarn typecheck && yarn build"
   },
   "repository": {
     "type": "git",
