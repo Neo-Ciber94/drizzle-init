@@ -119,3 +119,7 @@ export async function replaceDoubleQuoteStrings(
     throw new Error(`${Array.from(errors).join("\n")}`);
   }
 }
+
+export function objectKeys<T extends Record<string, unknown>>(obj: T): (keyof T)[] {
+  return Object.keys(obj) as (keyof T)[];
+}

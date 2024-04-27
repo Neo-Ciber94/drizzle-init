@@ -13,7 +13,7 @@ import {
   POSTGRESTQL_DB_PROVIDERS,
   SQLITE_PROVIDERS,
 } from "./types";
-import { detectPackageManager, detectProjectLanguage } from "./utils";
+import { detectPackageManager, detectProjectLanguage, objectKeys } from "./utils";
 import {
   validateConfigType,
   validateDatabaseDir,
@@ -200,10 +200,6 @@ async function run(init: Options) {
   }
 
   await initCommand(init as InitCommandArgs);
-}
-
-function objectKeys<T extends Record<string, unknown>>(obj: T): (keyof T)[] {
-  return Object.keys(obj) as (keyof T)[];
 }
 
 command
