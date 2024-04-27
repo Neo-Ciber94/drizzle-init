@@ -52,8 +52,6 @@ export type InitCommandArgs = {
 export default async function initCommand(args: InitCommandArgs) {
   const providerDir = path.join(TEMPLATES_PATH, "providers", args.driver, args.dbProvider);
   const packageManager = await detectPackageManager();
-  const packageJsonPath = path.join(process.cwd(), "package.json");
-  const hasPackageJson = await fse.exists(packageJsonPath);
 
   if (!(await fse.exists(providerDir))) {
     throw new Error(
@@ -97,17 +95,6 @@ export default async function initCommand(args: InitCommandArgs) {
     try {
       await installDeps({ deps: dependencies, isDev: false });
       await installDeps({ deps: devDependencies, isDev: true });
-
-      // If the project doesn't have a package.json, it was generated after installing
-      if (!hasPackageJson) {
-        const runMigration = getRunMigrationScript(args);
-        await replaceDoubleQuoteStrings(
-          {
-            [RUN_MIGRATION_SCRIPT_PLACEHOLDER]: runMigration,
-          },
-          [packageJsonPath]
-        );
-      }
     } catch (cause) {
       if (cause instanceof Error) {
         const packageManager = (await detectPackageManager()) ?? "npm";
@@ -227,6 +214,9 @@ async function writeDatabaseProviderTemplate(
   const { configFilePath, migrateFilePath, schemaFilePath, databaseFilePath } = getFilePaths(args);
   console.log("\n");
 
+  // Ensure outdir exists
+  await fse.ensureDir(args.outDir);
+
   // drizzle.config.{ts|js}
   let configContents = template.drizzleConfigContents;
 
@@ -287,13 +277,14 @@ async function updatePackageJsonScripts(args: InitCommandArgs) {
   }
 
   const packageJson: PackageJson = await fse.readJSON(packageFilePath);
+  const runMigration = getRunMigrationScript(args);
   packageJson.scripts ??= {}; // ensure no empty
 
   packageJson.scripts = {
     ...packageJson.scripts,
     ["db:push"]: dbScripts["db:push"],
     ["db:generate"]: dbScripts["db:generate"],
-    ["db:migrate"]: dbScripts["db:migrate"],
+    ["db:migrate"]: dbScripts["db:migrate"].replace(RUN_MIGRATION_SCRIPT_PLACEHOLDER, runMigration),
   };
 
   // TODO: format with prettier?

@@ -89,7 +89,13 @@ export async function replaceDoubleQuoteStrings(
     try {
       let contents = await fse.readFile(filePath, "utf-8");
       for (const [replace, newValue] of Object.entries(replacements)) {
-        contents = contents.replace(`"${replace}"`, `"${newValue}"`);
+        const regex = new RegExp(`(["'])(.*)${replace}(.*)\\1`);
+        contents = contents.replace(regex, (_, ...matches) => {
+          const quote = matches[0];
+          const start = matches[1];
+          const end = matches[2];
+          return `${quote}${start}${newValue}${end}${quote}`;
+        });
       }
 
       await fse.writeFile(filePath, contents);
