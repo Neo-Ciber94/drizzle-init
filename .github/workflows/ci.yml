@@ -8,7 +8,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -26,6 +26,9 @@ jobs:
 
     - name: Typecheck
       run: yarn run typecheck
+
+    - name: Tests
+      run: yarn run test
 
     - name: Lint
       run: yarn run lint
