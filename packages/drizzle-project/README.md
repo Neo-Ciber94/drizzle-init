@@ -1,6 +1,7 @@
 # Drizzle init-project
 
 [![CI](https://github.com/Neo-Ciber94/drizzle-init/actions/workflows/ci.yml/badge.svg)](https://github.com/Neo-Ciber94/drizzle-init/actions/workflows/ci.yml)
+[![npm version](https://badge.fury.io/js/create-drizzle-project.svg)](https://badge.fury.io/js/create-drizzle-project)
 
 Initialize a project with drizzle-orm.
 
