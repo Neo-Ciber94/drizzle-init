@@ -245,7 +245,7 @@ describe("Run cli with customs options", () => {
     await runDrizzleInitProject(tempDir, {
       driver: "mysql",
       dbProvider: "mysql2",
-      migrateFile: "/db/migrator.ts",
+      migrateFile: "db/migrator.ts",
       configType: "typescript",
       databaseDir: "./db",
       outDir: "db/migrations",
