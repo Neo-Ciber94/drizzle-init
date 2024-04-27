@@ -52,3 +52,40 @@ export async function detectProjectLanguage(): Promise<Language | null> {
 
   return null;
 }
+
+export async function replaceDoubleQuoteStrings(
+  replacements: Record<string, string>,
+  filePaths: string[]
+) {
+  const promises = filePaths.map(async (filePath) => {
+    if (!(await fse.exists(filePath))) {
+      throw new Error(`File "${filePath}" does not exist`);
+    }
+
+    try {
+      let contents = await fse.readFile(filePath, "utf-8");
+      for (const [replace, newValue] of Object.entries(replacements)) {
+        contents = contents.replace(`"${replace}"`, `"${newValue}"`);
+      }
+
+      await fse.writeFile(filePath, contents);
+    } catch (err) {
+      throw new Error(`Failed to replace contents of file "${filePath}"`);
+    }
+  });
+
+  const results = await Promise.allSettled(promises);
+  const errors = new Set<string>();
+
+  for (const result of results) {
+    if (result.status === "rejected") {
+      const error =
+        result.reason instanceof Error ? result.reason.message : "Failed to replace contents";
+      errors.add(error);
+    }
+  }
+
+  if (errors.size > 0) {
+    throw new Error(`${Array.from(errors).join("\n")}`);
+  }
+}

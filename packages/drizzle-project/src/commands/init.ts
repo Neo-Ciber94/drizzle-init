@@ -7,7 +7,6 @@ import type { Driver, Language, DbProvider } from "../types";
 import { detectPackageManager, replaceDoubleQuoteStrings } from "../utils";
 
 const __dirname = fileURLToPath(import.meta.url);
-//const DATABASE_DIR_PLACEHOLDER = "#databaseDir";
 const RUN_MIGRATION_SCRIPT_PLACEHOLDER = "#runMigration";
 
 // When the code is bundle the template folder will be on the same directory than this
@@ -74,6 +73,7 @@ export default async function initCommand(args: InitCommandArgs) {
   await writeDatabaseProviderTemplate(providerTemplate, args);
 
   // 4. Replace placeholder strings
+  await replacePlaceholders(args);
 
   // 5. Update package.json database scripts
   await updatePackageJsonScripts(args);
@@ -226,9 +226,9 @@ function getFilePaths(args: InitCommandArgs) {
   const migrateFilePath = path.join(process.cwd(), `${args.migrateFile}`);
   const schemaFilePath = path.join(process.cwd(), args.databaseDir, `schema.${extension}`);
   const databaseFilePath = path.join(process.cwd(), args.databaseDir, `index.${extension}`);
-  const packageJson = path.join(process.cwd(), "package.json");
+  const packageJsonPath = path.join(process.cwd(), "package.json");
 
-  return { configFilePath, migrateFilePath, schemaFilePath, databaseFilePath, packageJson };
+  return { configFilePath, migrateFilePath, schemaFilePath, databaseFilePath, packageJsonPath };
 }
 
 async function writeDatabaseProviderTemplate(
@@ -257,13 +257,21 @@ async function writeDatabaseProviderTemplate(
   await safeWriteFile(migrateFilePath, template.migrateFileContents);
 }
 
-async function replacePlaceholders(template: DatabaseProviderTemplate, args: InitCommandArgs) {
-  const { configFilePath, databaseFilePath, migrateFilePath, packageJson, schemaFilePath } =
+async function replacePlaceholders(args: InitCommandArgs) {
+  const { configFilePath, databaseFilePath, migrateFilePath, packageJsonPath, schemaFilePath } =
     getFilePaths(args);
 
-    await replaceDoubleQuoteStrings({
-      ""
-    })
+  const runMigration =
+    args.configType === "javascript" ? `node ${args.migrateFile}` : `npx tsx ${args.migrateFile}`;
+
+  await replaceDoubleQuoteStrings(
+    {
+      [RUN_MIGRATION_SCRIPT_PLACEHOLDER]: runMigration,
+      "#databaseDir": args.databaseDir,
+      "#outDir": args.outDir,
+    },
+    [configFilePath, databaseFilePath, migrateFilePath, packageJsonPath, schemaFilePath]
+  );
 }
 
 async function updatePackageJsonScripts(args: InitCommandArgs) {
@@ -281,9 +289,6 @@ async function updatePackageJsonScripts(args: InitCommandArgs) {
 
   const packageJson: PackageJson = await fse.readJSON(packageFilePath);
   packageJson.scripts ??= {}; // ensure no empty
-
-  // const runMigration =
-  //   args.configType === "javascript" ? `node ${args.migrateFile}` : `npx tsx ${args.migrateFile}`;
 
   packageJson.scripts = {
     ...packageJson.scripts,

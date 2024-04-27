@@ -1,4 +1,4 @@
 import { migrate } from "drizzle-orm/bun-sqlite/migrator";
 import { db } from "#databaseDir";
 
-migrate(db, { migrationsFolder: "./drizzle" });
+migrate(db, { migrationsFolder: "#outDir" });

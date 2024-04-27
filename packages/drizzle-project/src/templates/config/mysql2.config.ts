@@ -8,7 +8,7 @@ if (!process.env.DATABASE_URL) {
 export default defineConfig({
   schema: "#databaseDir/schema.ts",
   driver: "mysql2",
-  out: "./drizzle",
+  out: "#outDir",
   dbCredentials: {
     uri: process.env.DATABASE_URL,
   },

@@ -12,7 +12,7 @@ if (!process.env.DATABASE_AUTH_TOKEN) {
 export default defineConfig({
   schema: "#databaseDir/schema.ts",
   driver: "turso",
-  out: "./drizzle",
+  out: "#outDir",
   dbCredentials: {
     url: process.env.DATABASE_URL,
     authToken: process.env.DATABASE_AUTH_TOKEN,

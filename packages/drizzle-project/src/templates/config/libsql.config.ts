@@ -8,7 +8,7 @@ if (!process.env.DATABASE_URL) {
 export default defineConfig({
   schema: "#databaseDir/schema.ts",
   driver: "libsql",
-  out: "./drizzle",
+  out: "#outDir",
   dbCredentials: {
     url: process.env.DATABASE_URL,
   },
