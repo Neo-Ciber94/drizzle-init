@@ -3,7 +3,7 @@ import fse from "fs-extra";
 import os from "os";
 import { type InitCommandArgs } from "../src/commands/init";
 import { describe, test, expect } from "vitest";
-import { exec } from "child_process";
+import { exec, execFile } from "child_process";
 import { MYSQL_DB_PROVIDERS } from "../src/types";
 
 const cliPath = path.join(process.cwd(), "dist", "cli.mjs");
@@ -109,7 +109,7 @@ async function runCommand({
   env?: Record<string, string>;
 }) {
   return new Promise<void>((resolve, reject) => {
-    const childProcess = exec(command, {
+    const childProcess = execFile(command, {
       cwd,
       env: {
         NODE_ENV: "TEST",

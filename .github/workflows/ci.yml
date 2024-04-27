@@ -12,11 +12,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
+    - name: Use Node.js 20.x
+      uses: actions/setup-node@v4
       with:
         node-version: 20.x
-        cache: 'yarn'
+
+    - name: Setup yarn
+      run: npm install -g yarn
+
+    - name: Setup Nodejs with yarn caching
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20.x
+        cache: yarn
 
     - name: Install
       run: yarn install --frozen-lockfile
@@ -26,10 +34,7 @@ jobs:
 
     - name: Typecheck
       run: yarn run typecheck
-
-    - name: Version
-      run: node --version
-
+      
     - name: Tests
       run: yarn run test
 
