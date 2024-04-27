@@ -3,7 +3,7 @@ import fse from "fs-extra";
 import os from "os";
 import { type InitCommandArgs } from "../src/commands/init";
 import { describe, test, expect } from "vitest";
-import { exec, execFile } from "child_process";
+import { exec } from "child_process";
 import { MYSQL_DB_PROVIDERS } from "../src/types";
 
 const cliPath = path.join(process.cwd(), "dist", "cli.mjs");
@@ -12,9 +12,13 @@ if (!(await fse.exists(cliPath))) {
   throw new Error(`CLI do not exists on : ${cliPath}`);
 }
 
-const npmInit = (cwd: string) => runCommand({ cwd, cmd: "npm", args: ["init", "-y"] });
-const npmDbGenerate = (cwd: string) =>
-  runCommand({ cwd, cmd: "npm", args: ["run", "db:generate"], env: { DATABASE_URL: "test" } });
+const npmInit = (cwd: string) => {
+  return execCommand({ cwd, cmd: "npm init -y" });
+};
+
+const npmDbGenerate = (cwd: string) => {
+  return execCommand({ cwd, cmd: "npm run db:generate", env: { DATABASE_URL: "test" } });
+};
 
 describe("Run cli", () => {
   for (const mysqlProvider of MYSQL_DB_PROVIDERS) {
@@ -95,46 +99,34 @@ async function runDrizzleInitProject(cwd: string, opts: Options) {
     }
   }
 
-  return runCommand({ cwd, cmd: "node", args });
+  const cmd = `node ${args.join(" ")}`;
+  return execCommand({ cwd, cmd });
 }
 
-async function runCommand({
+async function execCommand({
   cwd,
   env,
   cmd,
-  isFile,
-  args = [],
 }: {
-  isFile?: boolean;
   cmd: string;
-  args?: string[];
   cwd: string;
   env?: Record<string, string>;
 }) {
-  const opts = {
-    cwd,
-    env: {
-      NODE_ENV: "TEST",
-      ...env,
-    },
-  };
-
   return new Promise<void>((resolve, reject) => {
-    const childProcess = (() => {
-      if (isFile) {
-        return execFile(cmd, args, { shell: true, ...opts });
-      } else {
-        return exec(`${cmd} ${args.join(" ")}`, { ...opts });
-      }
-    })();
+    const childProcess = exec(cmd, {
+      cwd,
+      env: {
+        ...process.env,
+        ...env,
+        NODE_ENV: "TEST",
+      },
+    });
 
     childProcess.stderr?.setEncoding("utf8");
     childProcess.stderr?.on("data", console.error);
 
     childProcess.on("close", () => resolve());
-    childProcess.on("error", (err) =>
-      reject(new Error(`Failed to run: '${cmd} ${args.join(" ")}': ${err}`))
-    );
+    childProcess.on("error", (err) => reject(new Error(`Failed to run: '${cmd}}': ${err}`)));
   });
 }
 
