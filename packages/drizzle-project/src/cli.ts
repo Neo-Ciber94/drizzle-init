@@ -44,12 +44,7 @@ const command = new Command()
     parseOption(validateConfigType)
   )
   .option("-m, --migrateFile <string>", "Migration file path", parseOption(validateMigrationFile))
-  .option(
-    "-o, --outDir <string>",
-    "Output directory, default to './drizzle'",
-    parseOption(validateOutputDir),
-    "./drizzle"
-  )
+  .option("-o, --outDir <string>", "Output directory", parseOption(validateOutputDir), "./drizzle")
   .option("-b, --databaseDir <string>", "Directory for the database and schema files")
   .option("-i, --install", "Whether if install the dependencies")
   .option("--no-install", "No install dependencies");
