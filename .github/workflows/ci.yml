@@ -27,6 +27,9 @@ jobs:
     - name: Typecheck
       run: yarn run typecheck
 
+    - name: Version
+      run: node --version
+
     - name: Tests
       run: yarn run test
 
