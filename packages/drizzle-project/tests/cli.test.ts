@@ -1,7 +1,6 @@
 import path from "path";
 import fse from "fs-extra";
 import os from "os";
-import spawn from "cross-spawn";
 import { type InitCommandArgs } from "../src/commands/init";
 import { describe, test, expect } from "vitest";
 import { exec } from "child_process";
@@ -11,6 +10,9 @@ const cliPath = path.join(process.cwd(), "dist", "cli.mjs");
 if (!(await fse.exists(cliPath))) {
   throw new Error(`CLI do not exists on : ${cliPath}`);
 }
+
+const npmInit = (cwd: string) => runCommand({ cwd, command: "npm init -y" });
+const npmDbGenerate = (cwd: string) => runCommand({ cwd, command: "npm run db:generate", env: { DATABASE_URL: "test" } });
 
 describe("Run cli", () => {
   test("Should init mysql2 drizzle template", { timeout: 120_000 }, async () => {
@@ -24,7 +26,7 @@ describe("Run cli", () => {
       migrateFile: "./migrate.ts",
       configType: "typescript",
       databaseDir: "./lib/db",
-      "no-install": true,
+      install: true,
     });
 
     await npmDbGenerate(tempDir);
@@ -55,56 +57,33 @@ async function runDrizzleInitProject(cwd: string, opts: Options) {
     }
   }
 
-  //   return new Promise<void>((resolve, reject) => {
-  //     const childProcess = spawn("node", args, {
-  //       cwd,
-  //       env: {
-  //         ...process.env,
-  //         NODE_ENV: "TEST",
-  //       },
-  //     });
-
-  //     childProcess.stdout?.on("data", (data) => console.log(data.toString("utf8")));
-  //     childProcess.on("close", () => resolve());
-  //     childProcess.on('message', console.log)
-  //     childProcess.on("error", () => reject(new Error("Failed to run cli")));
-  //   });
-  return new Promise<void>((resolve, reject) => {
-    const childProcess = exec(`node ${args.join(" ")}`);
-
-    childProcess.stdout?.on("data", (data) => console.log(data.toString("utf8")));
-    childProcess.on("close", () => resolve());
-    childProcess.on("error", () => reject(new Error("Failed to run cli")));
-  });
+  const command = `node ${args.join(" ")}`;
+  return runCommand({ cwd, command });
 }
 
-async function npmDbGenerate(cwd: string) {
+async function runCommand({
+  cwd,
+  env,
+  command,
+}: {
+  command: string;
+  cwd: string;
+  env?: Record<string, string>;
+}) {
   return new Promise<void>((resolve, reject) => {
-    const childProcess = spawn("npm", ["run", "db:generate"], {
+    const childProcess = exec(command, {
       cwd,
       env: {
-        ...process.env,
         NODE_ENV: "TEST",
+        ...env,
       },
     });
 
-    childProcess.on("close", () => resolve());
-    childProcess.on("error", () => reject(new Error("Failed to run 'npm run db:generate'")));
-  });
-}
-
-async function npmInit(cwd: string) {
-  return new Promise<void>((resolve, reject) => {
-    const childProcess = spawn("npm", ["init", "-y"], {
-      cwd,
-      env: {
-        ...process.env,
-        NODE_ENV: "TEST",
-      },
-    });
+    childProcess.stderr?.setEncoding("utf8");
+    childProcess.stderr?.on("data", console.error);
 
     childProcess.on("close", () => resolve());
-    childProcess.on("error", () => reject(new Error("Failed to run 'npm init -y'")));
+    childProcess.on("error", () => reject(new Error(`Failed to run: '${command}'`)));
   });
 }
 
