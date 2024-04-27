@@ -12,9 +12,9 @@ if (!(await fse.exists(cliPath))) {
   throw new Error(`CLI do not exists on : ${cliPath}`);
 }
 
-const npmInit = (cwd: string) => runCommand({ cwd, command: "npm init -y" });
+const npmInit = (cwd: string) => runCommand({ cwd, cmd: "npm", args: ["init", "-y"] });
 const npmDbGenerate = (cwd: string) =>
-  runCommand({ cwd, command: "npm run db:generate", env: { DATABASE_URL: "test" } });
+  runCommand({ cwd, cmd: "npm", args: ["run", "db:generate"], env: { DATABASE_URL: "test" } });
 
 describe("Run cli", () => {
   for (const mysqlProvider of MYSQL_DB_PROVIDERS) {
@@ -95,33 +95,46 @@ async function runDrizzleInitProject(cwd: string, opts: Options) {
     }
   }
 
-  const command = `node ${args.join(" ")}`;
-  return runCommand({ cwd, command });
+  return runCommand({ cwd, cmd: "node", args, isFile: true });
 }
 
 async function runCommand({
   cwd,
   env,
-  command,
+  cmd,
+  isFile,
+  args = [],
 }: {
-  command: string;
+  isFile?: boolean;
+  cmd: string;
+  args?: string[];
   cwd: string;
   env?: Record<string, string>;
 }) {
+  const opts = {
+    cwd,
+    env: {
+      NODE_ENV: "TEST",
+      ...env,
+    },
+  };
+
   return new Promise<void>((resolve, reject) => {
-    const childProcess = execFile(command, {
-      cwd,
-      env: {
-        NODE_ENV: "TEST",
-        ...env,
-      },
-    });
+    const childProcess = (() => {
+      if (isFile) {
+        return execFile(cmd, args, { shell: true, ...opts });
+      } else {
+        return exec(`${cmd} ${args.join(" ")}`, { ...opts });
+      }
+    })();
 
     childProcess.stderr?.setEncoding("utf8");
     childProcess.stderr?.on("data", console.error);
 
     childProcess.on("close", () => resolve());
-    childProcess.on("error", () => reject(new Error(`Failed to run: '${command}'`)));
+    childProcess.on("error", (err) =>
+      reject(new Error(`Failed to run: '${cmd} ${args.join(" ")}': ${err}`))
+    );
   });
 }
 
