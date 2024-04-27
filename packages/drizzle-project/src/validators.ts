@@ -70,3 +70,9 @@ export function validateDatabaseDir(input: string): ValidatorResult<string> {
     ? { success: false, error: "Database and schema path should be relative to the current dir" }
     : { success: true, data: input };
 }
+
+export function validateOutputDir(input: string): ValidatorResult<string> {
+  return path.isAbsolute(input)
+    ? { success: false, error: "Output directory path should be relative to the current dir" }
+    : { success: true, data: input };
+}

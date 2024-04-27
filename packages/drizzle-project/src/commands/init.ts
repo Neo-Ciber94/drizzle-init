@@ -4,10 +4,10 @@ import { fileURLToPath } from "url";
 import chalk from "chalk";
 import spawn from "cross-spawn";
 import type { Driver, Language, DbProvider } from "../types";
-import { detectPackageManager } from "../utils";
+import { detectPackageManager, replaceDoubleQuoteStrings } from "../utils";
 
 const __dirname = fileURLToPath(import.meta.url);
-const DATABASE_DIR_PLACEHOLDER = "#databaseDir";
+//const DATABASE_DIR_PLACEHOLDER = "#databaseDir";
 const RUN_MIGRATION_SCRIPT_PLACEHOLDER = "#runMigration";
 
 // When the code is bundle the template folder will be on the same directory than this
@@ -46,6 +46,7 @@ export type InitCommandArgs = {
   dbProvider: DbProvider;
   configType: Language;
   migrateFile: string;
+  outDir: string;
   databaseDir: string;
   installDeps: boolean;
 };
@@ -72,10 +73,12 @@ export default async function initCommand(args: InitCommandArgs) {
   // 3. Write template files
   await writeDatabaseProviderTemplate(providerTemplate, args);
 
-  // 4. Update package.json database scripts
+  // 4. Replace placeholder strings
+
+  // 5. Update package.json database scripts
   await updatePackageJsonScripts(args);
 
-  // 5. Install dependencies
+  // 6. Install dependencies
   const { dependencies, devDependencies } = getDepsToInstall(providerTemplate, args);
 
   console.log("\n");
@@ -217,20 +220,26 @@ async function readDatabaseProviderTemplate(
   }
 }
 
-async function writeDatabaseProviderTemplate(
-  template: DatabaseProviderTemplate,
-  args: InitCommandArgs
-) {
+function getFilePaths(args: InitCommandArgs) {
   const extension = args.configType === "typescript" ? "ts" : "js";
   const configFilePath = path.join(process.cwd(), `drizzle.config.${extension}`);
   const migrateFilePath = path.join(process.cwd(), `${args.migrateFile}`);
   const schemaFilePath = path.join(process.cwd(), args.databaseDir, `schema.${extension}`);
   const databaseFilePath = path.join(process.cwd(), args.databaseDir, `index.${extension}`);
+  const packageJson = path.join(process.cwd(), "package.json");
 
+  return { configFilePath, migrateFilePath, schemaFilePath, databaseFilePath, packageJson };
+}
+
+async function writeDatabaseProviderTemplate(
+  template: DatabaseProviderTemplate,
+  args: InitCommandArgs
+) {
+  const { configFilePath, migrateFilePath, schemaFilePath, databaseFilePath } = getFilePaths(args);
   console.log("\n");
 
   // drizzle.config.{ts|js}
-  let configContents = replaceDatabaseDirPlaceholder(template.drizzleConfigContents, args);
+  let configContents = template.drizzleConfigContents;
 
   if (args.configType === "javascript") {
     configContents = configContents.replace("schema.ts", "schema.js");
@@ -245,10 +254,16 @@ async function writeDatabaseProviderTemplate(
   await safeWriteFile(databaseFilePath, template.databaseDriverContents);
 
   // migrate.{ts|js}
-  await safeWriteFile(
-    migrateFilePath,
-    replaceDatabaseDirPlaceholder(template.migrateFileContents, args)
-  );
+  await safeWriteFile(migrateFilePath, template.migrateFileContents);
+}
+
+async function replacePlaceholders(template: DatabaseProviderTemplate, args: InitCommandArgs) {
+  const { configFilePath, databaseFilePath, migrateFilePath, packageJson, schemaFilePath } =
+    getFilePaths(args);
+
+    await replaceDoubleQuoteStrings({
+      ""
+    })
 }
 
 async function updatePackageJsonScripts(args: InitCommandArgs) {
@@ -267,22 +282,18 @@ async function updatePackageJsonScripts(args: InitCommandArgs) {
   const packageJson: PackageJson = await fse.readJSON(packageFilePath);
   packageJson.scripts ??= {}; // ensure no empty
 
-  const runMigration =
-    args.configType === "javascript" ? `node ${args.migrateFile}` : `npx tsx ${args.migrateFile}`;
+  // const runMigration =
+  //   args.configType === "javascript" ? `node ${args.migrateFile}` : `npx tsx ${args.migrateFile}`;
 
   packageJson.scripts = {
     ...packageJson.scripts,
     ["db:push"]: dbScripts["db:push"],
     ["db:generate"]: dbScripts["db:generate"],
-    ["db:migrate"]: dbScripts["db:migrate"].replace(RUN_MIGRATION_SCRIPT_PLACEHOLDER, runMigration),
+    ["db:migrate"]: dbScripts["db:migrate"],
   };
 
   // TODO: format with prettier?
   await fse.writeJSON(packageFilePath, packageJson, { spaces: 2 });
-}
-
-function replaceDatabaseDirPlaceholder(contents: string, args: InitCommandArgs) {
-  return contents.replace(DATABASE_DIR_PLACEHOLDER, args.databaseDir);
 }
 
 function getDepsToInstall(template: DatabaseProviderTemplate, args: InitCommandArgs) {
