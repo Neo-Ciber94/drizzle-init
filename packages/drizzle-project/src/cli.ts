@@ -44,7 +44,12 @@ const command = new Command()
     parseOption(validateConfigType)
   )
   .option("-m, --migrateFile <string>", "Migration file path", parseOption(validateMigrationFile))
-  .option("-o, --outDir <string>", "Output directory", parseOption(validateOutputDir), "./drizzle")
+  .option(
+    "-o, --outDir <string>",
+    "Migrations output directory",
+    parseOption(validateOutputDir),
+    "./drizzle"
+  )
   .option("-b, --databaseDir <string>", "Directory for the database and schema files")
   .option("-i, --install", "Whether if install the dependencies")
   .option("--no-install", "No install dependencies");
@@ -66,6 +71,9 @@ async function run(init: Options) {
   const hasAppDirectory = await fse.exists(path.join(process.cwd(), "app"));
   const projectLang = await detectProjectLanguage();
   const packageManager = (await detectPackageManager()) ?? "npm";
+
+  // We only ask for the output directory when the cli is called without args
+  const promptOutDir = objectKeys(init).filter((x) => x !== "outDir").length === 0;
 
   if (!init.driver) {
     init.driver = await inquirer
@@ -164,6 +172,20 @@ async function run(init: Options) {
       .then((x) => x.databaseDir);
   }
 
+  if (promptOutDir) {
+    init.outDir = await inquirer
+      .prompt({
+        name: "outDir",
+        message: "Migrations output directory",
+        validate(input) {
+          const result = validateOutputDir(input);
+          return result.success ? true : result.error;
+        },
+        default: "./drizzle",
+      })
+      .then((x) => x.outDir);
+  }
+
   init.installDeps = init.install;
 
   if (init.installDeps == null) {
@@ -178,6 +200,10 @@ async function run(init: Options) {
   }
 
   await initCommand(init as InitCommandArgs);
+}
+
+function objectKeys<T extends Record<string, unknown>>(obj: T): (keyof T)[] {
+  return Object.keys(obj) as (keyof T)[];
 }
 
 command

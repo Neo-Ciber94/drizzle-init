@@ -54,9 +54,7 @@ export default async function initCommand(args: InitCommandArgs) {
   const packageManager = await detectPackageManager();
 
   if (!(await fse.exists(providerDir))) {
-    throw new Error(
-      `Database provider '${args.dbProvider}' for '${args.driver}' is not implemented yet`
-    );
+    throw new Error(`Database provider '${args.dbProvider}' for '${args.driver}' was not found`);
   }
 
   // Sanitize paths
