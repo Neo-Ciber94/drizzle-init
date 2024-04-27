@@ -1,6 +1,7 @@
 import fse from "fs-extra";
 import path from "path";
 import { type Language } from "./types";
+import spawn from "cross-spawn";
 
 let DECTECTED_PACKAGE_MANAGER: PackageManager | undefined | null = undefined;
 
@@ -51,6 +52,29 @@ export async function detectProjectLanguage(): Promise<Language | null> {
   }
 
   return null;
+}
+
+export async function installDeps({ isDev, deps }: { isDev: boolean; deps: string[] }) {
+  const packageManager = (await detectPackageManager()) ?? "npm";
+  const args: string[] = ["add"];
+
+  if (isDev) {
+    args.push("-D");
+  }
+
+  args.push(...deps);
+
+  return new Promise<void>((resolve, reject) => {
+    const childProcess = spawn(packageManager, args, {
+      stdio: "inherit",
+      env: {
+        ...process.env,
+      },
+    });
+
+    childProcess.on("close", () => resolve());
+    childProcess.on("error", () => reject(`Failed to install dependencies: ${deps.join(", ")}`));
+  });
 }
 
 export async function replaceDoubleQuoteStrings(

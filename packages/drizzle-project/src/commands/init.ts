@@ -2,9 +2,8 @@ import fse from "fs-extra";
 import path from "path";
 import { fileURLToPath } from "url";
 import chalk from "chalk";
-import spawn from "cross-spawn";
 import type { Driver, Language, DbProvider } from "../types";
-import { detectPackageManager, replaceDoubleQuoteStrings } from "../utils";
+import { detectPackageManager, installDeps, replaceDoubleQuoteStrings } from "../utils";
 
 const __dirname = fileURLToPath(import.meta.url);
 const RUN_MIGRATION_SCRIPT_PLACEHOLDER = "#runMigration";
@@ -53,6 +52,8 @@ export type InitCommandArgs = {
 export default async function initCommand(args: InitCommandArgs) {
   const providerDir = path.join(TEMPLATES_PATH, "providers", args.driver, args.dbProvider);
   const packageManager = await detectPackageManager();
+  const packageJsonPath = path.join(process.cwd(), "package.json");
+  const hasPackageJson = await fse.exists(packageJsonPath);
 
   if (!(await fse.exists(providerDir))) {
     throw new Error(
@@ -96,6 +97,17 @@ export default async function initCommand(args: InitCommandArgs) {
     try {
       await installDeps({ deps: dependencies, isDev: false });
       await installDeps({ deps: devDependencies, isDev: true });
+
+      // If the project doesn't have a package.json, it was generated after installing
+      if (!hasPackageJson) {
+        const runMigration = getRunMigrationScript(args);
+        await replaceDoubleQuoteStrings(
+          {
+            [RUN_MIGRATION_SCRIPT_PLACEHOLDER]: runMigration,
+          },
+          [packageJsonPath]
+        );
+      }
     } catch (cause) {
       if (cause instanceof Error) {
         const packageManager = (await detectPackageManager()) ?? "npm";
@@ -114,29 +126,6 @@ export default async function initCommand(args: InitCommandArgs) {
   if (packageManager == null) {
     await updatePackageJsonScripts(args);
   }
-}
-
-async function installDeps({ isDev, deps }: { isDev: boolean; deps: string[] }) {
-  const packageManager = (await detectPackageManager()) ?? "npm";
-  const args: string[] = ["add"];
-
-  if (isDev) {
-    args.push("-D");
-  }
-
-  args.push(...deps);
-
-  return new Promise<void>((resolve, reject) => {
-    const childProcess = spawn(packageManager, args, {
-      stdio: "inherit",
-      env: {
-        ...process.env,
-      },
-    });
-
-    childProcess.on("close", () => resolve());
-    childProcess.on("error", () => reject(`Failed to install dependencies: ${deps.join(", ")}`));
-  });
 }
 
 interface DatabaseProviderTemplate {
@@ -257,12 +246,22 @@ async function writeDatabaseProviderTemplate(
   await safeWriteFile(migrateFilePath, template.migrateFileContents);
 }
 
+function getRunMigrationScript(args: InitCommandArgs) {
+  return args.configType === "javascript"
+    ? `node ${args.migrateFile}`
+    : `npx tsx ${args.migrateFile}`;
+}
+
 async function replacePlaceholders(args: InitCommandArgs) {
   const { configFilePath, databaseFilePath, migrateFilePath, packageJsonPath, schemaFilePath } =
     getFilePaths(args);
 
-  const runMigration =
-    args.configType === "javascript" ? `node ${args.migrateFile}` : `npx tsx ${args.migrateFile}`;
+  const runMigration = getRunMigrationScript(args);
+  const filePaths = [configFilePath, databaseFilePath, migrateFilePath, schemaFilePath];
+
+  if (await fse.exists(packageJsonPath)) {
+    filePaths.push(packageJsonPath);
+  }
 
   await replaceDoubleQuoteStrings(
     {
@@ -270,7 +269,7 @@ async function replacePlaceholders(args: InitCommandArgs) {
       "#databaseDir": args.databaseDir,
       "#outDir": args.outDir,
     },
-    [configFilePath, databaseFilePath, migrateFilePath, packageJsonPath, schemaFilePath]
+    filePaths
   );
 }
 
