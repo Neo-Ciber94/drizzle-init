@@ -3,9 +3,9 @@ export const DRIVERS = ["mysql", "postgresql", "sqlite"] as const;
 export const MYSQL_DB_PROVIDERS = ["mysql2", "planetscale"] as const;
 
 export const POSTGRESTQL_DB_PROVIDERS = [
+  "postgres-js",
   "node-postgres",
   "neon-http",
-  "postgres-js",
   "pglite",
 ] as const;
 
